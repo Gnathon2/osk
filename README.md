@@ -1,8 +1,8 @@
 # INSTRUCTIONS POUR DL LE LOGICIEL
 
 dl dans osk :
-    visual.py
-    cercle.py
+    visual.py,
+    cercle.py,
     data.py
 
 tout mettre dans le meme dossier 
