@@ -19,4 +19,4 @@ def multiline(*lines) :
         S = S + '\n' + line
     return S
 
-# oui la fonction aussi il faut la prendre
+(oui la fonction aussi il faut la prendre)
