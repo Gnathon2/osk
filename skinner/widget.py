@@ -1,5 +1,6 @@
 # widget.py
 """des fonctions et widgets en plus pour tkinter"""
+
 import tkinter as tk
 from tkinter import ttk
 from constant import *
