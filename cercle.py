@@ -1,23 +1,23 @@
 """Pour fabriquer des cercles pour osu!, verion ultime.
 
-r = rayon
+r = rayon en pixels
 n = taille d'image en pixels
-a = alpha
+a = alpha en [0;1]
 e = epaisseur
+th = angle en radians
 
 f : r |-> alpha(r)
 
 R,G,B : [0; 1]
 l,c = indices ligne colonne
 
-
 """
-
+# TODO Fclr avec 3 cannaux (h,s,v a priori)
+# TODO faire en sorte que Fclr et Falpha prennent les memes args (r,th)
 
 from math import sqrt, exp,sin, inf, atan2, pi
 import numpy as np
-from thomas import plt
-from thomas.builtins import plage
+from thomas import plt, plage
 from thomas.couleur import hsv2rgb
 
 rayon = lambda l,c : sqrt(l**2 + c**2)
@@ -99,33 +99,8 @@ def showcircle(overlay, circle, clr) :
     plt.close()
 
 
-## couleur
-
-def plain(r,g,b):
-    if r==g==b==None :
-        rgb = (1,1,1)
-    elif r==None or g==None or b==None :
-        raise TypeError('None non expecté(s)')
-    else :
-        rgb = (r,g,b)
-    return lambda *args : rgb
-
-
-def radhue(s=None,v=None,phi=None) :
-    if s==None : s = 1
-    if v==None : v = 1
-    if phi==None : phi = 0
-
-    def f(l,c) :
-        h = (phi + atan2(l,c)) / (2 * pi)
-        if h<0 : h = 0
-        elif h>1 : h=1
-        return hsv2rgb((h,s,v))
-    
-    return f
-
-
 ## deco
+
 def sup(func,rmax):
     def f(r):
         return func(r) if r<rmax else 0
@@ -173,6 +148,25 @@ def triple(f1,r1,f2,r2,f3,*,xy=False):
             else : return f3(r)
     return f
 
+def oignon(*rlim_f,xy=False) :
+    """fait des couronnes de f(...) a partir de rlim"""
+    rlim_f = sorted(rlim_f, key = lambda x:x[0] if x[0]!=None else 0)
+    if xy :
+        def g(x,y) :
+            r = sqrt(x**2+y**2)
+            ref = rlim_f[0][1]
+            for rlim,f in rlim_f :
+                if rlim < r : ref = f
+            return ref(x,y)
+    else :
+        def g(r) :
+            ref = rlim_f[0][1]
+            for rlim,f in rlim_f :
+                if rlim < r : ref = f
+            return ref(r)
+    return g
+
+
 
 def compose(*ARG):
     tup = ARG[-1]
@@ -186,7 +180,7 @@ def compose(*ARG):
         func = f(func,*arg)
     return f
 
-## bases
+## ALPHA
 
 def cst(alpha=None):
     if alpha==None : alpha = 1
@@ -211,21 +205,21 @@ def sinus(omega,phi=0):
     return lambda r : (sin(omega*r + phi) + 1) / 2
 
 class Falpha :
-    def __init__(self, fbase, amin = None, amax = None, rmin =None, rmax = None,a0=None) :
+    def __init__(self, fbase, amin = None, amax = None, rmin =None, rmax = None,aext=None) :
         if amin == None : amin = 0
         if amax == None : amax = 1
         if rmin == None : rmin = 0
         if rmax == None : rmax = inf
-        if a0 == None : a0 = 0
+        if aext == None : aext = 0
         self.f = fbase
         self.a = (amin,amax)
-        self.a0= a0
+        self.aext= aext
         self.r = (rmin,rmax)
             
     def __call__(self, r) :
         rmin,rmax = self.r
         if not rmin <= r <= rmax  :
-            a = self.a0
+            a = self.aext
         else :
             amin,amax = self.a
             a = self.f(r)
@@ -236,7 +230,7 @@ class Falpha :
         return a
     
     def data(self) :
-        return f"a : {self.a}, r : {self.r}, a0 : {self.a0}"
+        return f"a : {self.a}, r : {self.r}, aext : {self.aext}"
 
 def fa_anneau_plain(alpha, rmax, epais = None) :
     '''crée un anneau blanc avec la data donnée'''
@@ -258,6 +252,31 @@ def fa_disque_gauss(sigma, puiss, rmax, amin,amax) :
     return f
 
 
+## COULEURS 
+
+
+def plain(r,g,b):
+    if r==g==b==None :
+        rgb = (1,1,1)
+    elif r==None or g==None or b==None :
+        raise TypeError('None non expecté(s)')
+    else :
+        rgb = (r,g,b)
+    return lambda *args : rgb
+
+
+def radhue(s=None,v=None,phi=None) :
+    if s==None : s = 1
+    if v==None : v = 1
+    if phi==None : phi = 0
+
+    def f(l,c) :
+        h = (phi + atan2(l,c)) / (2 * pi)
+        if h<0 : h = 0
+        elif h>1 : h=1
+        return hsv2rgb((h,s,v))
+    
+    return f
 
 ## USINES
 
