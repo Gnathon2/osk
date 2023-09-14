@@ -22,17 +22,17 @@
 # imports generaux
 import pygame as pg
 import matplotlib.pyplot as plt
+from colour import hsl2rgb
 
 # imports persos
 from thomas import multiline
-from thomas.couleur import hsv2rgb
 
 # imports locaux
 from cercle import megafunc, teinture
 from constant import *
-from skinneur.widget import *
-from skinneur.apercu import *
-from skinneur.fichier import *
+from skinner.widget import *
+from skinner.apercu import *
+from skinner.fichier import *
 
 
 
@@ -178,9 +178,9 @@ def get_tint() :
         # g = recup_entry(entry_tint_gs, 1)
         # b = recup_entry(entry_tint_bv, 1)
         rgb = recup_mentry(data['clr'])
-    elif mode == 'hsv' :
-        hsv = recup_mentry(data['clr'])
-        rgb = hsv2rgb(hsv)
+    elif mode == 'hsl' :
+        hsl = recup_mentry(data['clr'])
+        rgb = hsl2rgb(hsl)
     return rgb
 
  
@@ -388,13 +388,13 @@ TK = { # elements de skin
         'combo' : grid_combo(
             FRAMES[TINT], 1, 
             bg=BG[CIRCLE], fg=FG,
-            values=['rgb', 'hsv'], 
+            values=['rgb', 'hsl'], 
             label='mode'),
         'clr' : grid_mentry(
             3, FRAMES[TINT],2,1,
             '1','.8','0',
             bg=BG[CIRCLE], fg=FG,
-            label=multiline('r/h','g/s','b/v')),
+            label=multiline('r/h','g/s','b/l')),
     },
     CURSOR : grid_circular(
         CURSOR, SUPERFRAMES[CURSOR], 0,
