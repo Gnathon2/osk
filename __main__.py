@@ -24,8 +24,11 @@ import pygame as pg
 import matplotlib.pyplot as plt
 from colour import hsl2rgb
 
-# imports persos
-from thomas import multiline
+def multiline(*lines) :
+    S = lines[0]
+    for line in lines[1:] :
+        S = S + '\n' + line
+    return S
 
 # imports locaux
 from cercle import megafunc, teinture
